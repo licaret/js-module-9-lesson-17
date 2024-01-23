@@ -10,7 +10,11 @@
   </head>
   <body>
     <button type="button" id="bNew">Make a promise</button>
-    <button type="button" id="bHandle">
+    <button
+      type="button"
+      id="bHandle"
+      title="Add multiple handlers before settling it"
+    >
       Add a pair of handlers
     </button>
     <button type="button" id="bFulfill">Fulfill it</button>
@@ -49,16 +53,21 @@
       bNew.addEventListener("click", newPromise)
       bHandle.addEventListener("click", () => {
         if (!promise) return
-        promise
+        promise = promise
           .then(
             () => {
               console.log("Promise is fullfiled")
+              return Promise.reject()
             },
             () => {
               console.log("Promise is rejected")
+              return Promise.resolve()
             }
           )
           .finally(settleThePromise)
+      })
+      addEventListener("unhandledrejection", event => {
+        event.preventDefault()
       })
     </script>
   </body>
