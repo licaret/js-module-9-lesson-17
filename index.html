@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <button type="button" id="bNew">Make a promise</button>
+    <button
+      type="button"
+      id="bHandle"
+      title="Add multiple handlers before settling it"
+    >
+      Add a pair of handlers
+    </button>
+    <button type="button" id="bFulfill">Fulfill it</button>
+    <button type="button" id="bReject">Reject it</button>
+    <script>
+      const bNew = document.getElementById("bNew")
+      const bHandle = document.getElementById("bHandle")
+      const bFulfill = document.getElementById("bFulfill")
+      const bReject = document.getElementById("bReject")
+      /** @type {Promise<void>?} */
+      let promise
+      settleThePromise()
+      function settleThePromise() {
+        bNew.removeAttribute("disabled")
+        bHandle.setAttribute("disabled", true)
+        bFulfill.setAttribute("disabled", true)
+        bReject.setAttribute("disabled", true)
+        promise = undefined
+      }
+      const executor = (resolve, reject) => {
+        bFulfill.addEventListener("click", resolve, {
+          once: true,
+        })
+        bReject.addEventListener("click", reject, {
+          once: true,
+        })
+      }
+      function newPromise() {
+        bNew.setAttribute("disabled", true)
+        bHandle.removeAttribute("disabled")
+        bFulfill.removeAttribute("disabled")
+        bReject.removeAttribute("disabled")
+        return (promise = new Promise(executor))
+      }
+
+      bNew.addEventListener("click", newPromise)
+      bHandle.addEventListener("click", () => {
+        if (!promise) return
+        promise = promise
+          .then(
+            () => {
+              console.log("Promise is fullfiled")
+              return Promise.reject()
+            },
+            () => {
+              console.log("Promise is rejected")
+              return Promise.resolve()
+            }
+          )
+          .finally(settleThePromise)
+      })
+      addEventListener("unhandledrejection", event => {
+        event.preventDefault()
+      })
+    </script>
+  </body>
+</html>
